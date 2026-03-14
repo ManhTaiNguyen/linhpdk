@@ -1,7 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import confetti from 'canvas-confetti';
-import { PartyPopper, RefreshCw, Wind, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import confetti from "canvas-confetti";
+import {
+  PartyPopper,
+  RefreshCw,
+  Wind,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 
 interface Candle {
   id: number;
@@ -11,13 +19,15 @@ interface Candle {
   color: string;
 }
 
-const CANDLE_COLORS = ['#FF595E', '#FFCA3A', '#8AC926', '#1982C4', '#6A4C93'];
+const CANDLE_COLORS = ["#FF595E", "#FFCA3A", "#8AC926", "#1982C4", "#6A4C93"];
 
 export default function App() {
-  const [age, setAge] = useState(24);
+  const [age, setAge] = useState(23);
   const [candles, setCandles] = useState<Candle[]>([]);
   const [isCelebration, setIsCelebration] = useState(false);
-  const [message, setMessage] = useState('Chúc Mừng Sinh Nhật Em An Ám Ảnk 2k12!');
+  const [message, setMessage] = useState(
+    "Chúc Mừng Sinh Nhật Em Linh Láo Lếu 2k13!",
+  );
   const [isMicEnabled, setIsMicEnabled] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(true);
@@ -35,7 +45,11 @@ export default function App() {
 
   // Watch candles for celebration
   useEffect(() => {
-    if (candles.length > 0 && candles.every(c => !c.isLit) && !isCelebration) {
+    if (
+      candles.length > 0 &&
+      candles.every((c) => !c.isLit) &&
+      !isCelebration
+    ) {
       triggerCelebration();
     }
   }, [candles, isCelebration]);
@@ -44,7 +58,10 @@ export default function App() {
   useEffect(() => {
     return () => {
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      if (
+        audioContextRef.current &&
+        audioContextRef.current.state !== "closed"
+      ) {
         audioContextRef.current.close();
       }
     };
@@ -54,7 +71,9 @@ export default function App() {
     setMicError(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioCtx = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )();
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 256;
       const source = audioCtx.createMediaStreamSource(stream);
@@ -68,14 +87,16 @@ export default function App() {
       detectBlow();
     } catch (err) {
       console.error("Mic error:", err);
-      setMicError("Không thể truy cập micro. Vui lòng cấp quyền trong trình duyệt.");
+      setMicError(
+        "Không thể truy cập micro. Vui lòng cấp quyền trong trình duyệt.",
+      );
       setIsMicEnabled(false);
     }
   };
 
   const disableMic = () => {
     if (requestRef.current) cancelAnimationFrame(requestRef.current);
-    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
       audioContextRef.current.close();
     }
     setIsMicEnabled(false);
@@ -95,15 +116,19 @@ export default function App() {
     const average = sum / bufferLength;
 
     // Threshold for blowing
-    if (average > 40) { // Lowered slightly to make it easier
+    if (average > 40) {
+      // Lowered slightly to make it easier
       const now = Date.now();
-      if (now - lastBlowTimeRef.current > 100) { // Blow out one candle every 100ms
-        setCandles(prev => {
-          const litCandles = prev.filter(c => c.isLit);
+      if (now - lastBlowTimeRef.current > 100) {
+        // Blow out one candle every 100ms
+        setCandles((prev) => {
+          const litCandles = prev.filter((c) => c.isLit);
           if (litCandles.length > 0) {
             const randomIdx = Math.floor(Math.random() * litCandles.length);
             const candleToBlow = litCandles[randomIdx];
-            return prev.map(c => c.id === candleToBlow.id ? { ...c, isLit: false } : c);
+            return prev.map((c) =>
+              c.id === candleToBlow.id ? { ...c, isLit: false } : c,
+            );
           }
           return prev;
         });
@@ -123,7 +148,7 @@ export default function App() {
       const randomOffset = (Math.random() - 0.5) * 20;
       const left = Math.cos(angle) * rx + randomOffset;
       const top = Math.sin(angle) * ry + randomOffset;
-      
+
       newCandles.push({
         id: i,
         isLit: true,
@@ -137,11 +162,13 @@ export default function App() {
   };
 
   const blowOutCandle = (id: number) => {
-    setCandles(prev => prev.map(c => c.id === id ? { ...c, isLit: false } : c));
+    setCandles((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, isLit: false } : c)),
+    );
   };
 
   const blowAllCandles = () => {
-    setCandles(prev => prev.map(c => ({ ...c, isLit: false })));
+    setCandles((prev) => prev.map((c) => ({ ...c, isLit: false })));
   };
 
   const triggerCelebration = () => {
@@ -155,14 +182,14 @@ export default function App() {
         angle: 60,
         spread: 55,
         origin: { x: 0 },
-        colors: CANDLE_COLORS
+        colors: CANDLE_COLORS,
       });
       confetti({
         particleCount: 5,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
-        colors: CANDLE_COLORS
+        colors: CANDLE_COLORS,
       });
 
       if (Date.now() < end) {
@@ -179,24 +206,37 @@ export default function App() {
   const toggleMute = () => {
     const newMuted = !isMuted;
     setIsMuted(newMuted);
-    videoRefs.current.forEach(v => {
+    videoRefs.current.forEach((v) => {
       if (v) v.muted = newMuted;
     });
   };
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center overflow-hidden font-sans text-slate-100 selection:bg-pink-500/30 relative">
-      
       {/* Background Videos - 4 corners with animations */}
       <div className="absolute inset-0 z-0 grid grid-cols-2 grid-rows-2 gap-1 p-1">
         {/* Top Left - has audio */}
         <motion.div
           initial={{ opacity: 0, x: -100, y: -100 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
-          transition={{ duration: 1, delay: 0.1, type: 'spring', stiffness: 60 }}
+          transition={{
+            duration: 1,
+            delay: 0.1,
+            type: "spring",
+            stiffness: 60,
+          }}
           className="relative overflow-hidden rounded-2xl border border-pink-500/20"
         >
-          <video ref={el => { videoRefs.current[0] = el; }} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-50">
+          <video
+            ref={(el) => {
+              videoRefs.current[0] = el;
+            }}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-50"
+          >
             <source src="/an_meme.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-transparent"></div>
@@ -206,10 +246,21 @@ export default function App() {
         <motion.div
           initial={{ opacity: 0, x: 100, y: -100 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
-          transition={{ duration: 1, delay: 0.3, type: 'spring', stiffness: 60 }}
+          transition={{
+            duration: 1,
+            delay: 0.3,
+            type: "spring",
+            stiffness: 60,
+          }}
           className="relative overflow-hidden rounded-2xl border border-amber-500/20"
         >
-          <video autoPlay loop muted playsInline className="w-full h-full object-cover opacity-50 scale-x-[-1]">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-50 scale-x-[-1]"
+          >
             <source src="/an_meme.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-bl from-amber-500/20 to-transparent"></div>
@@ -219,10 +270,21 @@ export default function App() {
         <motion.div
           initial={{ opacity: 0, x: -100, y: 100 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
-          transition={{ duration: 1, delay: 0.5, type: 'spring', stiffness: 60 }}
+          transition={{
+            duration: 1,
+            delay: 0.5,
+            type: "spring",
+            stiffness: 60,
+          }}
           className="relative overflow-hidden rounded-2xl border border-purple-500/20"
         >
-          <video autoPlay loop muted playsInline className="w-full h-full object-cover opacity-50 scale-y-[-1]">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-50 scale-y-[-1]"
+          >
             <source src="/an_meme.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-transparent"></div>
@@ -232,10 +294,21 @@ export default function App() {
         <motion.div
           initial={{ opacity: 0, x: 100, y: 100 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
-          transition={{ duration: 1, delay: 0.7, type: 'spring', stiffness: 60 }}
+          transition={{
+            duration: 1,
+            delay: 0.7,
+            type: "spring",
+            stiffness: 60,
+          }}
           className="relative overflow-hidden rounded-2xl border border-emerald-500/20"
         >
-          <video autoPlay loop muted playsInline className="w-full h-full object-cover opacity-50 scale-[-1]">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-50 scale-[-1]"
+          >
             <source src="/an_meme.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-tl from-emerald-500/20 to-transparent"></div>
@@ -265,35 +338,39 @@ export default function App() {
             duration: 3 + Math.random() * 2,
             repeat: Infinity,
             delay: Math.random() * 2,
-            ease: 'easeInOut',
+            ease: "easeInOut",
           }}
         />
       ))}
 
       <div className="absolute top-8 left-0 right-0 flex flex-col items-center gap-4 z-20">
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-amber-300 text-center px-4"
-          style={{ textShadow: '0 4px 24px rgba(236, 72, 153, 0.3)' }}
+          style={{ textShadow: "0 4px 24px rgba(236, 72, 153, 0.3)" }}
         >
           {message}
         </motion.h1>
-        
+
         <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 bg-slate-800/50 backdrop-blur-md p-2 rounded-3xl border border-slate-700/50 shadow-xl max-w-[95vw]">
           <div className="flex items-center gap-2 px-2 md:px-4">
             <span className="text-sm font-medium text-slate-300">Tuổi:</span>
-            <input 
-              type="number" 
-              min="1" 
-              max="100" 
+            <input
+              type="number"
+              min="1"
+              max="100"
               value={age}
-              onChange={(e) => setAge(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+              onChange={(e) =>
+                setAge(
+                  Math.max(1, Math.min(100, parseInt(e.target.value) || 1)),
+                )
+              }
               className="w-16 bg-slate-700 text-white rounded px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-pink-500"
             />
           </div>
           <div className="hidden md:block w-px h-6 bg-slate-700"></div>
-          
+
           {isMicEnabled ? (
             <button
               onClick={disableMic}
@@ -312,7 +389,7 @@ export default function App() {
             </button>
           )}
 
-          <button 
+          <button
             onClick={blowAllCandles}
             className="flex items-center gap-2 px-3 md:px-4 py-2 hover:bg-slate-700 rounded-full transition-colors text-sm font-medium text-pink-300 hover:text-pink-200"
           >
@@ -324,9 +401,11 @@ export default function App() {
             className="flex items-center gap-2 px-3 md:px-4 py-2 hover:bg-slate-700 rounded-full transition-colors text-sm font-medium text-cyan-300 hover:text-cyan-200"
           >
             {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            <span className="hidden sm:inline">{isMuted ? 'Bật tiếng' : 'Tắt tiếng'}</span>
+            <span className="hidden sm:inline">
+              {isMuted ? "Bật tiếng" : "Tắt tiếng"}
+            </span>
           </button>
-          <button 
+          <button
             onClick={reset}
             className="flex items-center gap-2 px-3 md:px-4 py-2 hover:bg-slate-700 rounded-full transition-colors text-sm font-medium text-amber-300 hover:text-amber-200"
           >
@@ -334,7 +413,7 @@ export default function App() {
             <span className="hidden sm:inline">Thắp Lại</span>
           </button>
         </div>
-        
+
         {micError && (
           <div className="text-red-400 text-sm mt-2 bg-red-400/10 px-4 py-2 rounded-full border border-red-400/20">
             {micError}
@@ -349,10 +428,8 @@ export default function App() {
 
         {/* The Cake */}
         <div className="relative w-[320px] h-[200px] md:w-[400px] md:h-[240px] perspective-[1000px]">
-          
           {/* Cake Top (Frosting) */}
           <div className="absolute top-0 left-0 w-full h-[120px] md:h-[140px] bg-pink-100 rounded-[50%] border-4 border-pink-200 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.05)] z-10 flex items-center justify-center">
-            
             {/* Candles Layer */}
             <div className="relative w-full h-full">
               <AnimatePresence>
@@ -362,24 +439,35 @@ export default function App() {
                     initial={{ opacity: 0, scale: 0, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0 }}
-                    transition={{ type: 'spring', damping: 15, stiffness: 200, delay: candle.id * 0.05 }}
+                    transition={{
+                      type: "spring",
+                      damping: 15,
+                      stiffness: 200,
+                      delay: candle.id * 0.05,
+                    }}
                     className="absolute w-4 h-16 md:w-5 md:h-20 -ml-2 -mt-16 md:-ml-2.5 md:-mt-20 cursor-pointer group"
-                    style={{ 
-                      left: `calc(50% + ${candle.left}px)`, 
+                    style={{
+                      left: `calc(50% + ${candle.left}px)`,
                       top: `calc(50% + ${candle.top}px)`,
-                      zIndex: Math.round(candle.top + 100) // Sort by Y position for proper overlapping
+                      zIndex: Math.round(candle.top + 100), // Sort by Y position for proper overlapping
                     }}
                     onClick={() => blowOutCandle(candle.id)}
                   >
                     {/* Candle Body */}
-                    <div 
+                    <div
                       className="absolute bottom-0 w-full h-full rounded-t-md shadow-sm overflow-hidden"
                       style={{ backgroundColor: candle.color }}
                     >
                       {/* Stripes */}
-                      <div className="w-full h-full opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 5px, white 5px, white 10px)' }}></div>
+                      <div
+                        className="w-full h-full opacity-20"
+                        style={{
+                          backgroundImage:
+                            "repeating-linear-gradient(45deg, transparent, transparent 5px, white 5px, white 10px)",
+                        }}
+                      ></div>
                     </div>
-                    
+
                     {/* Wick */}
                     <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0.5 h-3 bg-slate-800"></div>
 
@@ -403,10 +491,17 @@ export default function App() {
             {/* Drips */}
             <div className="absolute top-0 left-0 w-full flex justify-around">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="w-8 h-12 bg-pink-100 rounded-b-full shadow-sm" style={{ height: `${Math.random() * 30 + 20}px`, transform: `translateY(-5px)` }}></div>
+                <div
+                  key={i}
+                  className="w-8 h-12 bg-pink-100 rounded-b-full shadow-sm"
+                  style={{
+                    height: `${Math.random() * 30 + 20}px`,
+                    transform: `translateY(-5px)`,
+                  }}
+                ></div>
               ))}
             </div>
-            
+
             {/* Middle Layer */}
             <div className="absolute top-1/2 left-0 w-full h-4 bg-pink-400/50"></div>
           </div>
@@ -419,17 +514,26 @@ export default function App() {
       {/* Celebration Overlay */}
       <AnimatePresence>
         {isCelebration && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             className="absolute z-50 pointer-events-none flex flex-col items-center"
           >
             <div className="bg-slate-900/90 backdrop-blur-xl p-8 md:p-10 rounded-3xl border border-pink-500/30 shadow-[0_0_50px_rgba(0,0,0,0.6)] flex flex-col items-center gap-4">
-              <PartyPopper size={64} className="text-pink-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]" />
-              <h2 className="text-3xl md:text-4xl font-bold text-white text-center drop-shadow-lg">Chúc Mừng Sinh Nhật</h2>
-              <h2 className="text-3xl md:text-4xl font-bold text-white text-center drop-shadow-lg">Em An Ám Ảnk 2k12!</h2>
-              <p className="text-pink-100 text-lg text-center font-medium">Tuổi mới thật nhiều niềm vui và hạnh phúc nhé!</p>
+              <PartyPopper
+                size={64}
+                className="text-pink-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]"
+              />
+              <h2 className="text-3xl md:text-4xl font-bold text-white text-center drop-shadow-lg">
+                Chúc Mừng Sinh Nhật
+              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-white text-center drop-shadow-lg">
+                Em Linh Láo Lếu 2k12!
+              </h2>
+              <p className="text-pink-100 text-lg text-center font-medium">
+                Tuổi mới thật nhiều niềm vui và hạnh phúc nhé!
+              </p>
             </div>
           </motion.div>
         )}
@@ -439,7 +543,6 @@ export default function App() {
       <div className="absolute bottom-8 text-slate-400 text-sm text-center px-4 z-10">
         Nhấn vào nến, thổi vào micro, hoặc nhấn nút "Thổi Nến" để tắt nến.
       </div>
-
     </div>
   );
 }
